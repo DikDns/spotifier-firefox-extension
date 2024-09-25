@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "SPOTifier Extension",
+  "version": "1.0",
+  "description": "Sistem Pembelajaran Online Terpadu, but better :)",
+  "permissions": ["cookies", "activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "*://*.spotifier.vercel.app/*",
+    "*://*.upi.edu/*",
+    "*://spot.upi.edu/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://*.spot.upi.edu/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "48": "icons/icon.png",
+    "128": "icons/icon.png"
+  }
+}
