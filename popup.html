@@ -3,36 +3,163 @@
   <head>
     <title>SPOTifier</title>
     <style>
+      :root {
+        --bg-color: #f5f5f5; /* Neutral light color */
+        --text-color: #2c3e50;
+        --secondary-text-color: #34495e;
+        --card-bg-color: #ffffff;
+        --active-color: #8b5cf6; /* Violet */
+        --switch-bg-color: #ccc; /* Keep this as is */
+        --switch-active-color: #8b5cf6; /* Changed to violet */
+        --shadow-color: rgba(0, 0, 0, 0.1);
+      }
+
+      :root[data-theme="dark"] {
+        --bg-color: #1a202c;
+        --text-color: #e2e8f0;
+        --secondary-text-color: #a0aec0;
+        --card-bg-color: #161d29;
+        --active-color: #a78bfa;
+        --switch-bg-color: #4a5568;
+        --switch-active-color: #a78bfa;
+        --shadow-color: rgba(255, 255, 255, 0.1);
+      }
+
       body {
-        font-family: Arial, sans-serif;
-        padding: 10px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        padding: 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        height: 100vh;
-        width: 256px; /* Set the width of the popup */
-        overflow: auto; /* Handle overflow content */
+        width: 300px;
+        background-color: var(--bg-color);
+        margin: 0;
+        color: var(--text-color);
+        transition: all 0.3s ease;
       }
 
       h3 {
-        font-size: 1.5em;
-        margin: 0;
-        font-weight: bold;
+        font-size: 1.8em;
+        margin: 0 0 15px 0;
       }
 
       p {
         font-size: 1em;
-        margin: 0;
+        margin: 0 0 20px 0;
         text-align: center;
+        color: var(--secondary-text-color);
+        line-height: 1.4;
+      }
+
+      .status {
+        background-color: var(--active-color);
+        color: var(--card-bg-color);
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.9em;
+        margin-bottom: 20px;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--switch-bg-color);
+        transition: 0.4s;
+        border-radius: 24px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: var(--card-bg-color);
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      input:checked + .slider {
+        background-color: var(--switch-active-color); /* Changed to violet */
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+
+      .setting {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        margin-top: 15px;
+        padding: 10px;
+        background-color: var(--card-bg-color);
+        border-radius: 8px;
+        box-shadow: 0 2px 4px var(--shadow-color);
+      }
+
+      .setting span {
+        font-size: 0.9em;
+      }
+
+      button {
+        transition: background-color 0.3s ease, transform 0.2s ease; /* Added transition */
+      }
+
+      button:hover {
+        background-color: #7a4bcf; /* Darker shade for hover */
+        transform: scale(1.05); /* Slightly enlarge on hover */
+      }
+
+      button:focus {
+        outline: 2px solid #7a4bcf; /* Outline on focus */
       }
     </style>
   </head>
   <body>
     <h3>SPOTifier</h3>
-    <p>
-      SPOTifier UPI is a killer extension for ordinary SPOT UPI User Interfaces
-    </p>
-    <p>Extension Active</p>
+    <p>SPOTifier takes SPOT to the modern era.</p>
+    <div class="status">Extension Active</div>
+    <div class="setting">
+      <span>Developer Mode</span>
+      <label class="switch">
+        <input type="checkbox" id="devModeSwitch" />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="setting">
+      <span>Show Initial Dialog</span>
+      <label class="switch">
+        <input type="checkbox" id="showDialogSwitch" />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="setting">
+      <span>Dark Mode</span>
+      <label class="switch">
+        <input type="checkbox" id="darkModeSwitch" />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <script src="popup.js"></script>
   </body>
 </html>

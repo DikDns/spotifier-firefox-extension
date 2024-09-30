@@ -1,61 +1,283 @@
-// Inject a new button into the sidebar
+// Constants
+const BUTTON_ID = "goToWebsite";
+const SIDEBAR_SELECTOR = "#side-menu";
+const COOKIE_DOMAIN = ".spot.upi.edu";
+const PROD_URL = "https://spotifier-upi.vercel.app";
+const DEV_URL = "http://localhost:3000";
+const SSO_PATH = "/api/sso";
+
+// Styles
+const styles = {
+  lightTheme: {
+    bgColor: "#f5f5f5",
+    textColor: "#2c3e50",
+    secondaryTextColor: "#34495e",
+    cardBgColor: "#ffffff",
+    activeColor: "#8b5cf6",
+    switchBgColor: "#ccc",
+    switchActiveColor: "#8b5cf6",
+    shadowColor: "rgba(0, 0, 0, 0.1)",
+  },
+  darkTheme: {
+    bgColor: "#1a202c",
+    textColor: "#e2e8f0",
+    secondaryTextColor: "#a0aec0",
+    cardBgColor: "#2d3748",
+    activeColor: "#a78bfa",
+    switchBgColor: "#4a5568",
+    switchActiveColor: "#a78bfa",
+    shadowColor: "rgba(255, 255, 255, 0.1)",
+  },
+  sidebar: `
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+  `,
+  button: `
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #8b5cf6; 
+    color: #2c3e50;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+    max-width: 200px;
+  `,
+  buttonIcon: `
+    margin-right: 8px;
+  `,
+  dialog: (theme) => `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: ${theme.cardBgColor};
+    color: ${theme.textColor};
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px ${theme.shadowColor};
+    z-index: 9999;
+    max-width: 90%;
+    width: 400px;
+  `,
+  dialogTitle: (theme) => `
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: ${theme.textColor};
+  `,
+  dialogText: (theme) => `
+    margin-bottom: 24px;
+    color: ${theme.secondaryTextColor};
+  `,
+  dialogButtons: `
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  `,
+  stayButton: (theme) => `
+    padding: 8px 16px;
+    background-color: ${theme.switchBgColor}; 
+    color: ${theme.textColor};
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  `,
+  goButton: (theme) => `
+    padding: 8px 16px;
+    background-color: ${theme.switchActiveColor};
+    color: ${theme.cardBgColor};
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  `,
+  backdrop: `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+  `,
+};
+
+// Helper functions
+function getTheme(isDark) {
+  return isDark ? styles.darkTheme : styles.lightTheme;
+}
+
+function createButton() {
+  const listItem = document.createElement("li");
+  const anchor = document.createElement("a");
+  anchor.setAttribute("href", "javascript:void(0);");
+  anchor.setAttribute("id", BUTTON_ID);
+  anchor.style.cssText = styles.goButton(getTheme(false));
+  anchor.innerHTML = `
+    <i class="fa fa-external-link" style="${styles.buttonIcon}"></i>
+    <span>Go to SPOTifier</span>
+  `;
+  listItem.appendChild(anchor);
+  return listItem;
+}
+
+function createDialog(theme) {
+  // Check if the current URL matches "spot.upi.edu/mhs"
+  if (!window.location.href.includes("spot.upi.edu/mhs")) {
+    return; // Don't show the dialog if we're not on the correct page
+  }
+
+  chrome.storage.sync.get("showDialog", function (data) {
+    if (data.showDialog === false) {
+      return; // Don't show the dialog if the user has chosen not to see it
+    }
+
+    const backdrop = document.createElement("div");
+    backdrop.id = "spotifier-backdrop";
+    backdrop.style.cssText = styles.backdrop;
+
+    const dialog = document.createElement("div");
+    dialog.id = "spotifier-dialog";
+    dialog.style.cssText = styles.dialog(theme);
+
+    dialog.innerHTML = `
+      <h2 style="${styles.dialogTitle(theme)}">Welcome to SPOTifier</h2>
+      <p style="${styles.dialogText(
+        theme
+      )}">Do you want to go to SPOTifier or stay on this page?</p>
+      <div style="margin-top: 16px;margin-bottom: 16px;">
+        <label>
+          <input type="checkbox" id="dont-show-again" style="margin-right: 8px;">
+          Don't show this again
+        </label>
+      </div>
+      <div style="${styles.dialogButtons}">
+        <button id="stay-btn" style="${styles.stayButton(
+          theme
+        )}">Stay Here</button>
+        <button id="go-btn" style="${styles.goButton(
+          theme
+        )}">Go to SPOTifier</button>
+      </div>
+    `;
+
+    document.body.appendChild(backdrop);
+    document.body.appendChild(dialog);
+
+    document.body.style.overflow = "hidden";
+
+    const stayBtn = dialog.querySelector("#stay-btn");
+    const goBtn = dialog.querySelector("#go-btn");
+    const dontShowAgainCheckbox = dialog.querySelector("#dont-show-again");
+
+    function removeDialog() {
+      if (dontShowAgainCheckbox.checked) {
+        chrome.storage.sync.set({ showDialog: false });
+      }
+      backdrop.remove();
+      dialog.remove();
+      document.body.style.overflow = "";
+    }
+
+    stayBtn.addEventListener("click", removeDialog);
+    goBtn.addEventListener("click", () => {
+      removeDialog();
+      handleNavigation();
+    });
+    backdrop.addEventListener("click", removeDialog);
+  });
+}
+
+function getCookieValue(cookies, name) {
+  return cookies.find((cookie) => cookie.name === name)?.value;
+}
+
+function buildTargetUrl(baseUrl, cookies) {
+  const params = new URLSearchParams({
+    "XSRF-TOKEN": getCookieValue(cookies, "XSRF-TOKEN"),
+    laravel_session: getCookieValue(cookies, "laravel_session"),
+    CASAuth: getCookieValue(cookies, "CASAuth"),
+  });
+  return `${baseUrl}${SSO_PATH}?${params.toString()}`;
+}
+
+// Main functions
 function injectButton() {
-  const sidebar = document.querySelector("#side-menu"); // Adjust this selector as needed
+  const sidebar = document.querySelector(SIDEBAR_SELECTOR);
   if (sidebar) {
-    const listItem = document.createElement("li");
-    const anchor = document.createElement("a");
-    anchor.setAttribute("href", "javascript:void(0);");
-    anchor.setAttribute("id", "goToWebsite");
-    anchor.classList.add("waves-effect");
-    anchor.innerHTML =
-      '<i class="fa fa-external-link"></i> <span class="hide-menu"><b>Pergi ke SPOTifier</b></span>';
-
-    listItem.appendChild(anchor);
-    sidebar.appendChild(listItem);
-
+    const button = createButton();
+    sidebar.appendChild(button);
+    sidebar.style.cssText = styles.sidebar;
     document
-      .getElementById("goToWebsite")
-      .addEventListener("click", handleButtonClick);
+      .getElementById(BUTTON_ID)
+      .addEventListener("click", handleNavigation);
   }
 }
 
-// Handle the button click and send cookies to your website
-function handleButtonClick() {
-  // First, get the cookies from the current domain (assuming cookies like 'username' and 'userid' are set)
+function handleNavigation() {
   chrome.runtime.sendMessage(
-    { action: "getCookies", domain: ".spot.upi.edu" },
+    { action: "getCookies", domain: COOKIE_DOMAIN },
     function (response) {
-      const cookies = response.cookies;
-      const xsrf_token = cookies.find(
-        (cookie) => cookie.name === "XSRF-TOKEN"
-      )?.value;
-      const laravel_session = cookies.find(
-        (cookie) => cookie.name === "laravel_session"
-      )?.value;
-      const cas_auth = cookies.find(
-        (cookie) => cookie.name === "CASAuth"
-      )?.value;
-
-      console.log("xsrf_token: ", xsrf_token);
-      console.log("laravel_session: ", laravel_session);
-      console.log("cas_auth: ", cas_auth);
-
-      // Send the cookies to your website using a POST request
-      const DEV_MODE = true;
-      const baseUrl = DEV_MODE
-        ? "http://localhost:3000"
-        : "https://spotifier-upi.vercel.app";
-      const path = "/api/sso";
-      const params = `XSRF-TOKEN=${xsrf_token}&laravel_session=${laravel_session}&CASAuth=${cas_auth}`;
-      const targetUrl = baseUrl + path + "?" + params;
-      console.log("targetUrl: ", targetUrl);
-
-      window.location.href = targetUrl;
+      if (chrome.runtime.lastError) {
+        console.error("Error sending message:", chrome.runtime.lastError);
+        fallbackNavigation();
+        return;
+      }
+      chrome.storage.sync.get("devMode", function (data) {
+        const baseUrl = data.devMode ? DEV_URL : PROD_URL;
+        const targetUrl = buildTargetUrl(baseUrl, response.cookies);
+        window.location.href = targetUrl;
+      });
     }
   );
 }
 
-// Inject the button on page load
-window.addEventListener("load", injectButton);
+function fallbackNavigation() {
+  // Fallback to navigating without cookies
+  const baseUrl = PROD_URL; // Always use PROD_URL in fallback
+  const targetUrl = `${baseUrl}${SSO_PATH}`;
+  window.location.href = targetUrl;
+}
+
+// Initialize
+function initialize() {
+  chrome.storage.sync.get("darkMode", function (data) {
+    const isDark = data.darkMode;
+    const theme = getTheme(isDark);
+    injectButton();
+
+    // Only create the dialog if we're on the correct page
+    if (window.location.href.includes("spot.upi.edu/mhs")) {
+      createDialog(theme);
+    }
+  });
+}
+
+window.addEventListener("load", initialize);
+
+// Listen for theme changes
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+  if (namespace === "sync" && changes.darkMode) {
+    const isDark = changes.darkMode.newValue;
+    const theme = getTheme(isDark);
+
+    const dialog = document.getElementById("spotifier-dialog");
+    if (dialog) {
+      dialog.style.cssText = styles.dialog(theme);
+      dialog.querySelector("h2").style.cssText = styles.dialogTitle(theme);
+      dialog.querySelector("p").style.cssText = styles.dialogText(theme);
+      dialog.querySelector("#stay-btn").style.cssText =
+        styles.stayButton(theme);
+      dialog.querySelector("#go-btn").style.cssText = styles.goButton(theme);
+    }
+  }
+});
 
 console.log("content.js from spotifier has been loaded");
