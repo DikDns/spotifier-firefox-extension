@@ -39,7 +39,7 @@ const styles = {
     display: flex;
     align-items: center;
     padding: 10px 15px;
-    background-color: #8b5cf6; 
+    background-color: #8b5cf6;
     color: #2c3e50;
     border: none;
     border-radius: 4px;
@@ -82,7 +82,7 @@ const styles = {
   `,
   stayButton: (theme) => `
     padding: 8px 16px;
-    background-color: ${theme.switchBgColor}; 
+    background-color: ${theme.switchBgColor};
     color: ${theme.textColor};
     border: none;
     border-radius: 4px;
@@ -211,6 +211,7 @@ function buildTargetUrl(baseUrl, cookies) {
 // Main functions
 function injectButton() {
   const sidebar = document.querySelector(SIDEBAR_SELECTOR);
+
   if (sidebar) {
     const button = createButton();
     sidebar.appendChild(button);
@@ -246,12 +247,33 @@ function fallbackNavigation() {
   window.location.href = targetUrl;
 }
 
+// Function to inject version info into extension page
+function injectVersionInfo() {
+  // Only run on extension pages
+  if (!window.location.pathname.includes("/extension")) return;
+
+  const version = chrome.runtime.getManifest().version;
+
+  // Find the version element
+  const versionElement = document.getElementById("extension-version");
+  if (versionElement) {
+    versionElement.innerHTML = `
+      <div class="flex items-center gap-3 rounded-full border border-green-200/20 bg-green-500/10 px-4 py-2 text-green-500">
+        <span class="font-medium">Installed Version ${version}</span>
+      </div>
+    `;
+  }
+}
+
 // Initialize
 function initialize() {
   chrome.storage.sync.get("darkMode", function (data) {
     const isDark = data.darkMode;
     const theme = getTheme(isDark);
     injectButton();
+    setTimeout(() => {
+      injectVersionInfo();
+    }, 500);
 
     // Only create the dialog if we're on the correct page
     if (window.location.href.includes("spot.upi.edu/mhs")) {

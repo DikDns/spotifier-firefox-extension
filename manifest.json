@@ -4,14 +4,26 @@
   "version": "1.0",
   "description": "Sistem Pembelajaran Online Terpadu, but better :)",
   "permissions": ["cookies", "activeTab", "scripting", "storage"],
+  "externally_connectable": {
+    "matches": [
+      "*://*.spotifier.vercel.app/*",
+      "*://localhost:*/*",
+      "*://127.0.0.1:*/*"
+    ]
+  },
   "host_permissions": [
-    "*://*.spotifier.vercel.app/*",
+    "*://localhost:*/*",
     "*://*.upi.edu/*",
-    "*://spot.upi.edu/*"
+    "*://spot.upi.edu/*",
+    "*://spotifier-upi.vercel.app/*"
   ],
   "content_scripts": [
     {
-      "matches": ["*://*.spot.upi.edu/*"],
+      "matches": [
+        "*://*.spot.upi.edu/*",
+        "*://*.spotifier-upi.vercel.app/*",
+        "*://localhost:*/*"
+      ],
       "js": ["content.js"],
       "run_at": "document_idle"
     }
