@@ -3,15 +3,11 @@
   "name": "SPOTifier Extension",
   "version": "1.0",
   "description": "Sistem Pembelajaran Online Terpadu, but better :)",
-  "permissions": ["cookies", "activeTab", "scripting", "storage"],
-  "externally_connectable": {
-    "matches": [
-      "*://*.spotifier.vercel.app/*",
-      "*://localhost:*/*",
-      "*://127.0.0.1:*/*"
-    ]
-  },
-  "host_permissions": [
+  "permissions": [
+    "cookies",
+    "activeTab",
+    "scripting",
+    "storage",
     "*://localhost:*/*",
     "*://*.upi.edu/*",
     "*://spot.upi.edu/*",

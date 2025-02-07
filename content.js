@@ -134,7 +134,7 @@ function createDialog(theme) {
     return; // Don't show the dialog if we're not on the correct page
   }
 
-  chrome.storage.sync.get("showDialog", function (data) {
+  browser.storage.sync.get("showDialog").then((data) => {
     if (data.showDialog === false) {
       return; // Don't show the dialog if the user has chosen not to see it
     }
@@ -179,7 +179,7 @@ function createDialog(theme) {
 
     function removeDialog() {
       if (dontShowAgainCheckbox.checked) {
-        chrome.storage.sync.set({ showDialog: false });
+        browser.storage.sync.set({ showDialog: false });
       }
       backdrop.remove();
       dialog.remove();
@@ -223,21 +223,20 @@ function injectButton() {
 }
 
 function handleNavigation() {
-  chrome.runtime.sendMessage(
-    { action: "getCookies", domain: COOKIE_DOMAIN },
-    function (response) {
-      if (chrome.runtime.lastError) {
-        console.error("Error sending message:", chrome.runtime.lastError);
+  browser.runtime
+    .sendMessage({ action: "getCookies", domain: COOKIE_DOMAIN })
+    .then((response) => {
+      if (browser.runtime.lastError) {
+        console.error("Error sending message:", browser.runtime.lastError);
         fallbackNavigation();
         return;
       }
-      chrome.storage.sync.get("devMode", function (data) {
+      browser.storage.sync.get("devMode").then((data) => {
         const baseUrl = data.devMode ? DEV_URL : PROD_URL;
         const targetUrl = buildTargetUrl(baseUrl, response.cookies);
         window.location.href = targetUrl;
       });
-    }
-  );
+    });
 }
 
 function fallbackNavigation() {
@@ -252,7 +251,7 @@ function injectVersionInfo() {
   // Only run on extension pages
   if (!window.location.pathname.includes("/extension")) return;
 
-  const version = chrome.runtime.getManifest().version;
+  const version = browser.runtime.getManifest().version;
 
   // Find the version element
   const versionElement = document.getElementById("extension-version");
@@ -267,7 +266,7 @@ function injectVersionInfo() {
 
 // Initialize
 function initialize() {
-  chrome.storage.sync.get("darkMode", function (data) {
+  browser.storage.sync.get("darkMode").then((data) => {
     const isDark = data.darkMode;
     const theme = getTheme(isDark);
     injectButton();
@@ -285,7 +284,7 @@ function initialize() {
 window.addEventListener("load", initialize);
 
 // Listen for theme changes
-chrome.storage.onChanged.addListener(function (changes, namespace) {
+browser.storage.onChanged.addListener(function (changes, namespace) {
   if (namespace === "sync" && changes.darkMode) {
     const isDark = changes.darkMode.newValue;
     const theme = getTheme(isDark);

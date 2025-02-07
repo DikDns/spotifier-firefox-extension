@@ -1,9 +1,9 @@
-// Listen for messages
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "getCookies") {
-    chrome.cookies.getAll({ domain: request.domain }, (cookies) => {
-      sendResponse({ cookies: cookies });
-    });
-    return true; // Indicates that the response is asynchronous
-  }
+browser.runtime.onMessage.addListener((request, sender) => {
+  return new Promise((resolve) => {
+    if (request.action === "getCookies") {
+      browser.cookies.getAll({ domain: request.domain }).then((cookies) => {
+        resolve({ cookies: cookies });
+      });
+    }
+  });
 });

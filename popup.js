@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Helper function to get extension page URL
   function getExtensionPageUrl(callback) {
-    chrome.storage.sync.get("devMode", (data) => {
+    browser.storage.sync.get("devMode").then((data) => {
       const baseUrl = data.devMode
         ? "http://localhost:3000"
         : "https://spotifier-upi.vercel.app";
@@ -32,9 +32,9 @@ document.addEventListener("DOMContentLoaded", function () {
     window.matchMedia("(prefers-color-scheme: dark)").matches;
 
   // Load the current states
-  chrome.storage.sync.get(
-    ["devMode", "showDialog", "darkMode"],
-    function (data) {
+  browser.storage.sync
+    .get(["devMode", "showDialog", "darkMode"])
+    .then((data) => {
       devModeSwitch.checked = data.devMode || false;
       showDialogSwitch.checked = data.showDialog !== false; // Default to true if not set
 
@@ -45,12 +45,11 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         setTheme(savedDarkMode);
       }
-    }
-  );
+    });
 
   // Save the devMode state when the switch is toggled
   devModeSwitch.addEventListener("change", function () {
-    chrome.storage.sync.set({ devMode: this.checked });
+    browser.storage.sync.set({ devMode: this.checked });
     // Update version display to show current mode
     getExtensionPageUrl((url) => {
       const modeText = this.checked ? "DEV" : "PROD";
@@ -60,20 +59,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Save the showDialog state when the switch is toggled
   showDialogSwitch.addEventListener("change", function () {
-    chrome.storage.sync.set({ showDialog: this.checked });
+    browser.storage.sync.set({ showDialog: this.checked });
   });
 
   // Handle dark mode toggle
   darkModeSwitch.addEventListener("change", function () {
     setTheme(this.checked);
-    chrome.storage.sync.set({ darkMode: this.checked });
+    browser.storage.sync.set({ darkMode: this.checked });
   });
 
   // Listen for system theme changes
   window
     .matchMedia("(prefers-color-scheme: dark)")
     .addEventListener("change", (e) => {
-      chrome.storage.sync.get("darkMode", function (data) {
+      browser.storage.sync.get("darkMode").then((data) => {
         if (data.darkMode === undefined) {
           setTheme(e.matches);
         }
