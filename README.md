@@ -21,7 +21,7 @@
 
 ### From SPOTifier Extension Page
 
-1. Visit [SPOTifier Extension Page](https://spotifier-upi.vercel.app/extension)
+1. Visit [SPOTifier Extension Page](https://spotifier-upi.vercel.app/extension) or [Github Releases Page](https://github.com/DikDns/spotifier-firefox-extension/releases)
 2. Click "Add to Firefox"
 3. Follow the installation prompts
 
