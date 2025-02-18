@@ -1,4 +1,3 @@
-# SPOTifier Firefox Extension
 
 <div align="center">
   <br/>
