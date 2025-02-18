@@ -106,4 +106,4 @@ For support, please open an issue in the repository or contact the maintainers.
 
 ---
 
-Made with ❤️ for UPI Students
+Made with ❤️ by dikdns for UPI Students
