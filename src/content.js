@@ -5,6 +5,7 @@ const COOKIE_DOMAIN = ".spot.upi.edu";
 const PROD_URL = "https://spotifier-upi.vercel.app";
 const DEV_URL = "http://localhost:3000";
 const SSO_PATH = "/api/sso";
+const EXTENSIONS_TYPE = "Firefox";
 
 // Styles
 const styles = {
@@ -226,8 +227,9 @@ function handleNavigation() {
   browser.runtime
     .sendMessage({ action: "getCookies", domain: COOKIE_DOMAIN })
     .then((response) => {
-      if (browser.runtime.lastError) {
-        console.error("Error sending message:", browser.runtime.lastError);
+      if (response.error) {
+        // Changed from browser.runtime.lastError
+        console.error("Error sending message:", response.error);
         fallbackNavigation();
         return;
       }
@@ -236,6 +238,11 @@ function handleNavigation() {
         const targetUrl = buildTargetUrl(baseUrl, response.cookies);
         window.location.href = targetUrl;
       });
+    })
+    .catch((error) => {
+      // Add error handling
+      console.error("Error:", error);
+      fallbackNavigation();
     });
 }
 
@@ -258,7 +265,7 @@ function injectVersionInfo() {
   if (versionElement) {
     versionElement.innerHTML = `
       <div class="flex items-center gap-3 rounded-full border border-green-200/20 bg-green-500/10 px-4 py-2 text-green-500">
-        <span class="font-medium">Installed Version ${version}</span>
+        <span class="font-medium">Installed ${EXTENSIONS_TYPE} Version ${version}</span>
       </div>
     `;
   }
@@ -281,8 +288,6 @@ function initialize() {
   });
 }
 
-window.addEventListener("load", initialize);
-
 // Listen for theme changes
 browser.storage.onChanged.addListener(function (changes, namespace) {
   if (namespace === "sync" && changes.darkMode) {
@@ -301,4 +306,5 @@ browser.storage.onChanged.addListener(function (changes, namespace) {
   }
 });
 
+initialize();
 console.log("content.js from spotifier has been loaded");

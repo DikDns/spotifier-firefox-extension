@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const versionSpan = document.getElementById("version");
 
   // Display current version
-  const manifest = chrome.runtime.getManifest();
+  // Replace chrome.runtime with browser.runtime
+  const manifest = browser.runtime.getManifest();
   versionSpan.textContent = manifest.version;
 
   // Helper function to get extension page URL

@@ -1,16 +1,13 @@
 {
   "manifest_version": 3,
   "name": "SPOTifier Extension",
-  "version": "1.0",
+  "version": "0.2",
   "description": "Sistem Pembelajaran Online Terpadu, but better :)",
-  "permissions": [
-    "cookies",
-    "activeTab",
-    "scripting",
-    "storage",
-    "*://localhost:*/*",
+  "permissions": ["cookies", "activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "*://localhost/*",
     "*://*.upi.edu/*",
-    "*://spot.upi.edu/*",
+    "*://*.spot.upi.edu/*",
     "*://spotifier-upi.vercel.app/*"
   ],
   "content_scripts": [
@@ -18,20 +15,36 @@
       "matches": [
         "*://*.spot.upi.edu/*",
         "*://*.spotifier-upi.vercel.app/*",
-        "*://localhost:*/*"
+        "*://localhost/*"
       ],
-      "js": ["content.js"],
-      "run_at": "document_idle"
+      "js": ["/src/content.js"]
     }
   ],
   "background": {
-    "service_worker": "background.js"
+    "scripts": ["/src/background.js"]
   },
   "action": {
-    "default_popup": "popup.html"
+    "default_title": "SPOTifier",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "24": "/src/icons/icon-24.png",
+      "48": "/src/icons/icon-48.png",
+      "128": "/src/icons/icon-128.png",
+      "256": "/src/icons/icon-256.png",
+      "512": "/src/icons/icon-512.png"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "contact.dikdns@gmail.com",
+      "update_url": "https://spotifier-upi.vercel.app/firefox-extensions-updates.json"
+    }
   },
   "icons": {
-    "48": "icons/icon.png",
-    "128": "icons/icon.png"
+    "24": "/src/icons/icon-24.png",
+    "48": "/src/icons/icon-48.png",
+    "128": "/src/icons/icon-128.png",
+    "256": "/src/icons/icon-256.png",
+    "512": "/src/icons/icon-512.png"
   }
 }
