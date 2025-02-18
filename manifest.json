@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SPOTifier Extension",
-  "version": "0.2",
+  "version": "0.3",
   "description": "Sistem Pembelajaran Online Terpadu, but better :)",
   "permissions": ["cookies", "activeTab", "scripting", "storage"],
   "host_permissions": [

@@ -1,8 +1,10 @@
-
 <div align="center">
   <br/>
+  <br/>
+  <img src="https://cdn.jsdelivr.net/gh/DikDns/spotifier-firefox-extension@main/src/icons/icon-256.png" alt="SPOTifier Logo" width="128" height="128"/>
   <h3>SPOTifier for Firefox Extension</h3>
   <p>This is the source code of the SPOTifier for Firefox Extension.</p>
+  <br/>
   <br/>
 </div>
 
