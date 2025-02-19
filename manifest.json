@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "SPOTifier Extension",
   "version": "0.3",
-  "description": "Sistem Pembelajaran Online Terpadu, but better :)",
+  "description": "SPOTifier takes SPOT to the modern era.",
   "permissions": ["cookies", "activeTab", "scripting", "storage"],
   "host_permissions": [
     "*://localhost/*",
@@ -18,6 +18,10 @@
         "*://localhost/*"
       ],
       "js": ["/src/content.js"]
+    },
+    {
+      "matches": ["*://*.spot.upi.edu/*"],
+      "js": ["/src/lib/tailwind@4.0.7.js", "/src/main-style.js"]
     }
   ],
   "background": {
